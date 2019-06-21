@@ -17,10 +17,10 @@
 NV_ARCH ?= -arch=sm_61
 CUDA_DIR ?= /usr/local/cuda
 
-MPI_HOME ?= /usr/local/mpi
-MPI_INCFLAGS = -I$(MPI_HOME)/include
+MPI_HOME ?= /home/$(USER)/.openmpi
+MPI_INCFLAGS = -I$(MPI_HOME)/include#-I$(MPI_HOME)/include
 
-NVCC_CXXFLAGS = -x=cu -std=c++11 -m64 --restrict -Xcompiler -Wall $(NV_ARCH)
+NVCC_CXXFLAGS = -x=cu -std=c++11 -m64 #--restrict -Xcompiler -Wall $(NV_ARCH)
 NVCC_LIBS = -Wl,-rpath -Wl,$(CUDA_DIR)/lib64 -L$(CUDA_DIR)/lib64 \
             -lcuda -lcudart -lcudadevrt -lnvToolsExt
 
@@ -82,16 +82,19 @@ ifeq (,$(filter help clean distclean style,$(MAKECMDGOALS)))
    -include $(CONFIG_MK)
 endif
 
+CHARMDIR = /home/$(USER)/charmworks/charm/netlrts-linux-x86_64-cuda
+
+NVCC_INC = -I$(CHARMDIR)/include -I$(CHARMDIR)/include/ampi -I$(CUDA_DIR)/include #-L$(CUDA_DIR)/lib64 -lcudart
 CXX = nvcc
-CPPFLAGS = $(MFEM_CPPFLAGS)
-CXXFLAGS = $(MFEM_CXXFLAGS)
+CPPFLAGS = $(MFEM_CPPFLAGS) $(NVCC_INC)
+CXXFLAGS = $(MFEM_CXXFLAGS) $(NVCC_INC)
 
 # MFEM config does not define C compiler
-CC     = gcc
+CC     = ampicc
 CFLAGS = -O3
 
 # Optional link flags
-LDFLAGS =
+LDFLAGS = -L$(CUDA_DIR)/lib64 -lcudart -L$(MPI_HOME)/lib
 
 OPTIM_OPTS = -O3
 DEBUG_OPTS = -g -Wall
@@ -105,7 +108,7 @@ ifneq ($(LAGHOS_DEBUG),$(MFEM_DEBUG))
 endif
 
 LAGHOS_FLAGS = $(CPPFLAGS) $(CXXFLAGS) $(MFEM_INCFLAGS) \
-      $(MPI_INCFLAGS) $(NVCC_CXXFLAGS) $(NVCC_INCFLAGS)
+       $(NVCC_CXXFLAGS) $(NVCC_INCFLAGS)
 LAGHOS_LIBS = $(MFEM_LIBS) $(NVCC_LIBS)
 
 ifeq ($(LAGHOS_DEBUG),YES)
@@ -256,5 +259,4 @@ FORMAT_FILES := $(SOURCE_FILES) $(HEADER_FILES)
 
 style:
 	@if ! $(ASTYLE) $(FORMAT_FILES) | grep Formatted; then\
-	   echo "No source files were changed.";\
-	fi
+echo "No source files were changed.";\

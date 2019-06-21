@@ -23,7 +23,9 @@
 
 // CUDA ************************************************************************
 #include <cuda.h>
-
+#include <cuda_runtime.h>
+// HAPI ************************************************************************
+#include "hapi.h"
 // MFEM/fem  *******************************************************************
 #include "fem/gridfunc.hpp"
 #include "general/communication.hpp"
@@ -58,4 +60,3 @@
 #include "./fem/bilininteg.hpp"
 
 #endif // LAGHOS_CUDA
-

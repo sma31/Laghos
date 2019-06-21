@@ -69,4 +69,3 @@ double vector_min(const int N, const double* __restrict x)
 {
    return cuVectorMin(N, x);
 }
-

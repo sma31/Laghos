@@ -58,6 +58,7 @@
 #include <iostream>
 #include <fstream>
 #include <sys/time.h>
+#include "ampi.h"
 
 using namespace std;
 using namespace mfem;
